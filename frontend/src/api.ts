@@ -3,8 +3,17 @@ import axios, { AxiosError } from 'axios';
 
 export const TOKEN_KEY = 'freshlytics_token';
 
+const getBaseUrl = (): string => {
+    let url = (import.meta.env.VITE_API_URL || 'https://freshlytics-api.onrender.com/api/v1').trim();
+    url = url.replace(/\/+$/, '');
+    if (!url.endsWith('/api/v1')) {
+        url = `${url}/api/v1`;
+    }
+    return url;
+};
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'https://freshlytics-api.onrender.com/api/v1',
+    baseURL: getBaseUrl(),
     timeout: 60000,
 });
 
