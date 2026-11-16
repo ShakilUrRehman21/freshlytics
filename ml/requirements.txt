@@ -1,0 +1,9 @@
+# Inference (used by the backend)
+torch
+torchvision
+numpy
+Pillow
+
+# Training / evaluation (ml/train.py)
+scikit-learn
+tqdm

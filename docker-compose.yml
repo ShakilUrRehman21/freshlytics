@@ -1,0 +1,53 @@
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${LOCAL_DB_PASSWORD:-postgres}
+      POSTGRES_DB: freshlytics
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      # Uses the bundled Postgres container. To use Neon/another cloud DB instead,
+      # set DATABASE_URL here (SSL is enabled automatically for non-local hosts).
+      - POSTGRES_SERVER=db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${LOCAL_DB_PASSWORD:-postgres}
+      - POSTGRES_DB=freshlytics
+      - SECRET_KEY=${SECRET_KEY:-supersecretkey_please_change_in_production}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app/backend
+      - ./ml:/app/ml
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000/api/v1
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
