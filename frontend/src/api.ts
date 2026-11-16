@@ -4,7 +4,7 @@ import axios, { AxiosError } from 'axios';
 export const TOKEN_KEY = 'freshlytics_token';
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || '/api/v1',
+    baseURL: import.meta.env.VITE_API_URL || 'https://freshlytics-api.onrender.com/api/v1',
     timeout: 60000,
 });
 
