@@ -18,7 +18,10 @@ if settings.is_postgres:
     connect_args["statement_cache_size"] = 0
     connect_args["prepared_statement_cache_size"] = 0
     if settings.use_ssl:
-        connect_args["ssl"] = ssl.create_default_context()
+        ssl_ctx = ssl.create_default_context()
+        ssl_ctx.check_hostname = False
+        ssl_ctx.verify_mode = ssl.CERT_NONE
+        connect_args["ssl"] = ssl_ctx
     engine_kwargs.update(pool_size=5, max_overflow=5, pool_recycle=300)
 elif settings.SQLALCHEMY_DATABASE_URI.startswith("sqlite"):
     connect_args["check_same_thread"] = False

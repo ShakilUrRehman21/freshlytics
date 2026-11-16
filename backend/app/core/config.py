@@ -64,10 +64,12 @@ class Settings(BaseSettings):
         mode = self.POSTGRES_SSL.lower()
         if mode in ("true", "1", "require", "yes"):
             return True
-        if mode in ("false", "0", "disable", "no"):
+        if mode in ("false", "0", "disable", "no", "off"):
             return False
         if self.DATABASE_URL:
             raw = os.getenv("DATABASE_URL", "")
+            if "sslmode=disable" in raw or "sslmode=no" in raw:
+                return False
             if "sslmode=require" in raw:
                 return True
             host = self.SQLALCHEMY_DATABASE_URI.split("@")[-1].split("/")[0].split(":")[0]
